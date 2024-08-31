@@ -600,35 +600,44 @@ impl Game {
 
             // Resource Check (CC, Nex, Hatch)
             if type_.is_resource_depot() {
-                let collides_with_resources = !self
-                    .get_units_in_rectangle(
-                        ((lt.x - 3) * 32, (lt.y - 3) * 32),
-                        ((rb.x + 4) * 32, (rb.y + 4) * 32),
-                        |unit: &Unit| {
-                            unit.get_type().is_mineral_field()
-                                || unit.get_type() == UnitType::Resource_Vespene_Geyser
-                        },
-                    )
-                    .is_empty();
+                /*
+                let units = self.get_units_in_rectangle(
+                    ((lt.x - 3) * 32, (lt.y - 3) * 32),
+                    ((rb.x + 3) * 32, (rb.y + 3) * 32),
+                    |unit: &Unit| {
+                        unit.get_type().is_mineral_field()
+                            || unit.get_type() == UnitType::Resource_Vespene_Geyser
+                    },
+                );
+                let collides_with_resources = !units.is_empty();
                 if collides_with_resources {
+                    println!(
+                        "BWAPI: collides with resources at {},{} -- {:?}",
+                        lt.x, lt.y, units
+                    );
                     return Ok(false);
                 }
+                */
+                // Nathan, 2024-08-03 - this seems to work better with placement. The above commented out
+                // code builds too far away from geysers and so never takes the right spot
                 // Original port from BWAPI (with pixel precision bug):
-                // for m in self.get_static_minerals() {
-                //     let tp = m.get_initial_tile_position();
-                //     if (self.is_visible(tp) || self.is_visible((tp.x + 1, tp.y))) && !m.exists() {
-                //         continue;
-                //     }
-                //     if tp.x > lt.x - 5 && tp.y > lt.y - 4 && tp.x < lt.x + 7 && tp.y < lt.y + 6 {
-                //         return Ok(false);
-                //     }
-                // }
-                // for g in self.get_static_geysers() {
-                //     let tp = g.get_initial_tile_position();
-                //     if tp.x > lt.x - 7 && tp.y > lt.y - 5 && tp.x < lt.x + 7 && tp.y < lt.y + 6 {
-                //         return Ok(false);
-                //     }
-                // }
+                for m in self.get_static_minerals() {
+                    let tp = m.get_initial_tile_position();
+                    if (self.is_visible(tp) || self.is_visible((tp.x + 1, tp.y))) && !m.exists() {
+                        continue;
+                    }
+                    if tp.x > lt.x - 5 && tp.y > lt.y - 4 && tp.x < lt.x + 7 && tp.y < lt.y + 6 {
+                        //println!("BWAPI: collided minerals at {},{}", lt.x, lt.y);
+                        return Ok(false);
+                    }
+                }
+                for g in self.get_static_geysers() {
+                    let tp = g.get_initial_tile_position();
+                    if tp.x > lt.x - 7 && tp.y > lt.y - 5 && tp.x < lt.x + 7 && tp.y < lt.y + 6 {
+                        //println!("BWAPI: collided gas at {},{}", lt.x, lt.y);
+                        return Ok(false);
+                    }
+                }
             }
         }
 
