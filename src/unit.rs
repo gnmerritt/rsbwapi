@@ -379,6 +379,11 @@ impl Unit {
         self.inner.shields
     }
 
+    pub fn get_shield_armor(&self) -> i32 {
+        self.get_player()
+            .get_upgrade_level(UpgradeType::Protoss_Plasma_Shields)
+    }
+
     pub fn get_space_remaining(&self) -> i32 {
         self.get_type().space_provided()
             - self
@@ -447,6 +452,10 @@ impl Unit {
 
     pub fn get_upgrade(&self) -> UpgradeType {
         UpgradeType::new(self.inner.upgrade)
+    }
+
+    pub fn get_armor(&self) -> i32 {
+        self.get_player().armor(self.get_type())
     }
 
     pub fn get_units_in_radius<Pred: IntoPredicate<Unit>>(
